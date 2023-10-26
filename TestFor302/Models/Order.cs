@@ -1,6 +1,6 @@
 ﻿namespace TestFor302.Models
 {
-    public class Orders
+    public class Order
     {
         public int Id { get; set; }
         public Client Client { get; set; }

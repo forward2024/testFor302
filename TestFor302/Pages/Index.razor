@@ -1,9 +1,101 @@
 ﻿@page "/"
+@inject IProduct serviceProduct
+@inject IClient serviceClient
 
-<PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<h3>Список продуктів</h3>
 
-Welcome to your new app.
+@if (serviceProduct.Products == null)
+{
+    <p><em>Завантаження...</em></p>
+}
+else if (!serviceProduct.Products.Any())
+{
+    <p>Немає продуктів.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Назва</th>
+                <th>Ціна</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in serviceProduct.Products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Price</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<h3>Список клієнтів</h3>
+@if (serviceClient.Clients == null)
+{
+    <p><em>Завантаження...</em></p>
+}
+else if (!serviceClient.Clients.Any())
+{
+    <p>Немає клієнтів.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>PersonalSale</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in serviceClient.Clients)
+            {
+                <tr>
+                    <td>
+                        @client.FirstName
+                        <InputText @bind-Value="client.FirstName" @onchange="@(async () => await UpdateClient(client))" />
+                    </td>
+                    <td>
+                        @client.LastName
+                        <InputText @bind-Value="client.LastName" @onchange="@(async () => await UpdateClient(client))" />
+                    </td>
+                    <td>
+                        @client.PersonalSale
+                        <InputNumber @bind-Value="client.PersonalSale" @onchange="@(async () => await UpdateClient(client))" />
+                    </td>
+                    <td>
+                        <button @onclick="@(() => DeleteClient(client.Id))">
+                            видалити
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        serviceProduct.Update += StateHasChanged;
+        serviceClient.Update += StateHasChanged;
+    }
+    private async Task DeleteClient(int id)
+    {
+        await serviceClient.DeleteClient(id);
+        StateHasChanged();
+    }
+    private async Task UpdateClient(Client client)
+    {
+        await serviceClient.EditClient(client);
+        StateHasChanged();
+    }
+}

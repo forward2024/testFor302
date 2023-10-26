@@ -1,0 +1,36 @@
+﻿@page "/create_client"
+@inject IClient serviceClient
+
+<h3>CreateClient</h3>
+
+<EditForm Model="newClient" OnValidSubmit="Send">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="FirstName">Ім'я:</label>
+        <InputText id="FirstName" class="form-control" @bind-Value="newClient.FirstName" required />
+    </div>
+
+    <div class="form-group">
+        <label for="LastName">Прізвище:</label>
+        <InputText id="LastName" class="form-control" @bind-Value="newClient.LastName" required />
+    </div>
+
+    <div class="form-group">
+        <label for="PersonalSale">Знижка (%):</label>
+        <InputNumber id="PersonalSale" class="form-control" @bind-Value="newClient.PersonalSale" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Створити клієнта</button>
+</EditForm>
+
+@code {
+    private Client newClient = new Client();
+
+    private async Task Send()
+    {
+        await serviceClient.CreateClient(newClient);
+        newClient = new Client();
+    }
+}

@@ -10,6 +10,6 @@ namespace TestFor302.Data
 
         public DbSet<Client> Clients { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Orders> Orders { get; set; }
+        public DbSet<Order> Orders { get; set; }
     }
 }

@@ -1,0 +1,25 @@
+﻿@page "/create_product"
+@inject IProduct serviceProduct
+
+<h3>Створити товар</h3>
+<form @onsubmit="Send">
+    <div class="form-group">
+        <label for="productName">Назва товару:</label>
+        <input @bind="newProduct.Name" type="text" class="form-control" id="productName" placeholder="Введіть назву товару">
+    </div>
+    <div class="form-group">
+        <label for="productPrice">Ціна товару:</label>
+        <input @bind="newProduct.Price" type="number" class="form-control" id="productPrice" placeholder="Введіть ціну товару">
+    </div>
+    <button type="submit" class="btn btn-primary">Створити</button>
+</form>
+
+@code {
+    private Product newProduct = new Product();
+
+    private async Task Send()
+    {
+        await serviceProduct.CreateProduct(newProduct);
+        newProduct = new Product();
+    }
+}
