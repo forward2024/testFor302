@@ -18,9 +18,9 @@ namespace TestFor302.Service.ClientService
 
         public List<Client> Clients { get; set; } = new List<Client>();
 
-        public async Task GetClients()
+        private async Task GetClients()
         {
-            using (var context1 = new EntityDbContext(options))
+            using (var context = new EntityDbContext(options))
             {
                 Clients = await context.Clients.ToListAsync();
             }

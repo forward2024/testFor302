@@ -18,11 +18,11 @@ namespace TestFor302.Service.ProductService
 
         public List<Product> Products { get; set; } = new List<Product>();
 
-        public async Task GetProducts()
+        private async Task GetProducts()
         {
-            using (var context1 = new EntityDbContext(options))
+            using (var context = new EntityDbContext(options))
             {
-                Products = await context1.Products.ToListAsync();
+                Products = await context.Products.ToListAsync();
             }
             Update?.Invoke();
         }

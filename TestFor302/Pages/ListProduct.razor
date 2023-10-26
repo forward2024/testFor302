@@ -1,5 +1,6 @@
 ﻿@inject IProduct serviceProduct
 @inject IClient serviceClient
+@inject IOrder serviceOrder
 <h3>Список продуктів</h3>
 
 @if (serviceProduct.Products == null)
@@ -39,11 +40,11 @@ else
     </table>
 
     <p>Розрахувати ціну товару під ID: <InputNumber @bind-Value="inputProductId" @onblur="@(() => checkValueForCalc())" /></p>
-    <p>для користувача особистий рахунок якого: <InputNumber @bind-Value="inputClientId" @onblur="@(() => checkValueForCalc())" /></p>
+    <p>користувач з особистий рахунком: <InputNumber @bind-Value="inputClientId" @onblur="@(() => checkValueForCalc())" /></p>
     <p>ціна: <InputNumber @bind-Value="calculatedValue" /></p>
     if (calculatedValue != 0)
     {
-        <button>
+        <button @onclick="@(() => SendOrder())">
             замовити
         </button>
     }
@@ -79,6 +80,7 @@ else
             calculatedValue = 0;
         }
     }
+
     private async Task CalcPrice(int clientId, int productId)
     {
         var client = serviceClient.Clients.FirstOrDefault(v => v.Id == clientId);
@@ -94,5 +96,16 @@ else
             calculatedValue = 0;
             error = "Клієнт або товар з таким номером не існує";
         }
+    }
+
+    private async Task SendOrder()
+    {
+        var item = new Order()
+        {
+            ClientId = inputClientId,
+            ProductId = inputProductId,
+            Price = calculatedValue
+        };
+        await serviceOrder.CreateOrder(item);
     }
 }

@@ -1,7 +1,61 @@
 ﻿@page "/orders"
+@inject IOrder serviceOrder
+@inject IProduct serviceProduct
+@inject IClient serviceClient
 
 <h3>Orders</h3>
+<p>користувач з особистий рахунком: <InputNumber @bind-Value="inputClientId" @onblur="@(() => checkHistory())" /></p>
+
+@if ((orders == null || !orders.Any()) && inputClientId != 0)
+{
+    <p>Немає замовлень або користувача для вказаного номера @inputClientId.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID замовлення</th>
+                <th>ID клієнта</th>
+                <th>ID продукту</th>
+                <th>Ціна</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in orders)
+            {
+                <tr>
+                    <td>@order.Id</td>
+                    <td>@order.ClientId</td>
+                    <td>@order.ProductId</td>
+                    <td>@order.Price</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
 
 @code {
+    string error;
+    int inputClientId = 0;
+    List<Order> orders = new List<Order>();
 
+    protected override async Task OnInitializedAsync()
+    {
+        serviceOrder.Update += StateHasChanged;
+    }
+
+    private async Task checkHistory()
+    {
+        if (inputClientId != 0 && serviceClient.Clients.Any(v => v.Id == inputClientId))
+        {
+            orders = serviceOrder.Orders.Where(v => v.ClientId == inputClientId).ToList();
+            error = null;
+        }
+        else
+        {
+            error = "Клієнт з таким номером не існує або inputClientId некоректний";
+        }
+    }
 }

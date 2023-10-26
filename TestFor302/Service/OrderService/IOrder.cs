@@ -2,7 +2,8 @@
 {
     public interface IOrder
     {
+        event Action Update;
+        List<Order> Orders { get; }
         Task CreateOrder(Order order);
-        Task GetOrders();
     }
 }

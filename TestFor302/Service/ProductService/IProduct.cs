@@ -4,7 +4,6 @@
     {
         event Action Update;
         List<Product> Products { get; }
-        Task GetProducts();
         Task CreateProduct(Product product);
         Task DeleteProduct(int id);
     }
