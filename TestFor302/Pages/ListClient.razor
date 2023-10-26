@@ -1,0 +1,62 @@
+﻿@inject IClient serviceClient
+
+<h3>Список клієнтів</h3>
+@if (serviceClient.Clients == null)
+{
+    <p><em>Завантаження...</em></p>
+}
+else if (!serviceClient.Clients.Any())
+{
+    <p>Немає клієнтів.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>FirstName</th>
+                <th>LastName</th>
+                <th>PersonalSale (%)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in serviceClient.Clients)
+            {
+                <tr>
+                    <td>@client.Id</td>
+                    <td>
+                        @client.FirstName
+                        <InputText @bind-Value="client.FirstName" @onblur="@(async () => await UpdateClient(client))" />
+                    </td>
+                    <td>
+                        @client.LastName
+                        <InputText @bind-Value="client.LastName" @onblur="@(async () => await UpdateClient(client))" />
+                    </td>
+                    <td>
+                        @client.PersonalSale (%)
+                        <InputNumber @bind-Value="client.PersonalSale" @onblur="@(async () => await UpdateClient(client))" />
+                    </td>
+                    <td>
+                        <button @onclick="@(() => serviceClient.DeleteClient(client.Id))">
+                            видалити
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        serviceClient.Update += StateHasChanged;
+    }
+    private async Task UpdateClient(Client client)
+    {
+        await serviceClient.EditClient(client);
+        StateHasChanged();
+    }
+}

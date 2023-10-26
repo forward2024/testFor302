@@ -4,21 +4,26 @@ namespace TestFor302.Service.ProductService
 {
     public class ServiceProduct : IProduct
     {
+        private readonly DbContextOptions<EntityDbContext> options;
         private readonly EntityDbContext context;
 
         public event Action Update;
 
-        public ServiceProduct(EntityDbContext context)
+        public ServiceProduct(DbContextOptions<EntityDbContext> options, EntityDbContext context)
         {
+            this.options = options;
             this.context = context;
             GetProducts();
         }
 
-        public List<Product> Products { get; set; }
+        public List<Product> Products { get; set; } = new List<Product>();
 
-        private async Task GetProducts()
+        public async Task GetProducts()
         {
-            Products = await context.Products.ToListAsync();
+            using (var context1 = new EntityDbContext(options))
+            {
+                Products = await context1.Products.ToListAsync();
+            }
             Update?.Invoke();
         }
 

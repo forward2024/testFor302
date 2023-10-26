@@ -4,6 +4,7 @@
     {
         event Action Update;
         List<Client> Clients { get; }
+        Task GetClients();
         Task CreateClient(Client client);
         Task EditClient(Client client);
         Task DeleteClient(int id);

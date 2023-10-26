@@ -4,21 +4,26 @@ namespace TestFor302.Service.ClientService
 {
     public class ServiceClient : IClient
     {
+        private readonly DbContextOptions<EntityDbContext> options;
         private readonly EntityDbContext context;
 
         public event Action Update;
 
-        public ServiceClient(EntityDbContext context)
+        public ServiceClient(EntityDbContext context, DbContextOptions<EntityDbContext> options)
         {
             this.context = context;
+            this.options = options;
             GetClients();
         }
 
-        public List<Client> Clients { get; set; }
+        public List<Client> Clients { get; set; } = new List<Client>();
 
-        private async Task GetClients()
+        public async Task GetClients()
         {
-            Clients = await context.Clients.ToListAsync();
+            using (var context1 = new EntityDbContext(options))
+            {
+                Clients = await context.Clients.ToListAsync();
+            }
             Update?.Invoke();
         }
 
@@ -38,17 +43,8 @@ namespace TestFor302.Service.ClientService
 
         public async Task EditClient(Client client)
         {
-            var newClient = await context.Clients.FindAsync(client.Id);
-
-            if (newClient != null)
-            {
-                context.Entry(newClient).CurrentValues.SetValues(client);
-                await context.SaveChangesAsync();
-            }
-            else
-            {
-                throw new InvalidOperationException("Клієнт не знайдений в базі даних.");
-            }
+            context.Clients.Update(client);
+            await context.SaveChangesAsync();
             await GetClients();
         }
     }

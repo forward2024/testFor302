@@ -1,0 +1,98 @@
+﻿@inject IProduct serviceProduct
+@inject IClient serviceClient
+<h3>Список продуктів</h3>
+
+@if (serviceProduct.Products == null)
+{
+    <p><em>Завантаження...</em></p>
+}
+else if (!serviceProduct.Products.Any())
+{
+    <p>Немає продуктів.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Назва</th>
+                <th>Ціна</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in serviceProduct.Products)
+            {
+                <tr>
+                    <th>@product.Id</th>
+                    <td>@product.Name</td>
+                    <td>@product.Price</td>
+                    <td>
+                        <button @onclick="@(() => serviceProduct.DeleteProduct(product.Id))">
+                            видалити
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <p>Розрахувати ціну товару під ID: <InputNumber @bind-Value="inputProductId" @onblur="@(() => checkValueForCalc())" /></p>
+    <p>для користувача особистий рахунок якого: <InputNumber @bind-Value="inputClientId" @onblur="@(() => checkValueForCalc())" /></p>
+    <p>ціна: <InputNumber @bind-Value="calculatedValue" /></p>
+    if (calculatedValue != 0)
+    {
+        <button>
+            замовити
+        </button>
+    }
+
+
+
+    @if (error != null)
+    {
+        <p>@error</p>
+    }
+}
+
+@code {
+
+    int inputProductId = 0;
+    int inputClientId = 0;
+    double calculatedValue = 0;
+    string error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        serviceProduct.Update += StateHasChanged;
+    }
+
+    private async void checkValueForCalc()
+    {
+        if (inputProductId != 0 && inputClientId != 0)
+        {
+            await CalcPrice(inputClientId, inputProductId);
+        }
+        else
+        {
+            calculatedValue = 0;
+        }
+    }
+    private async Task CalcPrice(int clientId, int productId)
+    {
+        var client = serviceClient.Clients.FirstOrDefault(v => v.Id == clientId);
+        var product = serviceProduct.Products.FirstOrDefault(v => v.Id == productId);
+
+        if (client != null && product != null)
+        {
+            calculatedValue = client.GetPrice(product.Price);
+            error = null;
+        }
+        else
+        {
+            calculatedValue = 0;
+            error = "Клієнт або товар з таким номером не існує";
+        }
+    }
+}

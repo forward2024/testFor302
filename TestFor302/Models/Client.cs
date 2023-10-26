@@ -7,9 +7,9 @@
         public string LastName { get; set; }
         public double PersonalSale { get; set; }
 
-        public double GetPrice(Product product)
+        public double GetPrice(double price)
         {
-            return product.Price * (1 - PersonalSale / 100);
+            return price * (1 - PersonalSale / 100);
         }
     }
 }
